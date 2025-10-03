@@ -70,6 +70,9 @@ Edit `backend/.env`:
 │   └── scripts/      # JavaScript logic
 └── docs/            # Documentation
 ```
+## Docs
+
+Follow the link to get more details: [JAAK Docs](https://docs.jaak.ai/docs/kyc-embebido-con-jaak-mosaic#/)
 
 ## License
 
