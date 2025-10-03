@@ -22,7 +22,7 @@ A complete implementation example for integrating JAAK Mosaic KYC verification i
 1. Clone and install dependencies:
 ```bash
 git clone https://github.com/soyYisus/jaak-kyc-mosaic-usage-example
-cd kyc-embebido
+cd jaak-kyc-mosaic-usage-example
 cd backend && npm install
 ```
 
