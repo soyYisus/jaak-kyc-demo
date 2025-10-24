@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Identidad - JAAK KYC</title>
+    <link rel="stylesheet" href="styles/login.css">
+    <!-- Montserrat - JAAK Corporate Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Toast notifications container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Card Header -->
+            <div class="card-header-content">
+                <img src="./assets/JAAK-logo-para-fondo-oscuro.png" alt="JAAK Logo" class="jaak-logo">
+                <h2>¡Bienvenido, haz un KYC ahora!</h2>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form">
+                <!-- Campo Usuario -->
+                <div class="field-container">
+                    <label for="username" class="field-label">Nombre Completo</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        class="form-input"
+                        placeholder="Ingrese su usuario"
+                        required
+                        minlength="3"
+                    />
+                    <div class="error-message" id="username-error">
+                        <div class="error-content">
+                            <span class="error-icon">⚠️</span>
+                            <span class="error-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div class="field-container">
+                    <label for="password" class="field-label">Contraseña</label>
+                    <div class="password-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input"
+                            placeholder="Ingrese su contraseña"
+                            required
+                            minlength="6"
+                        />
+                        <button type="button" class="password-toggle" id="passwordToggle">
+                            <span class="toggle-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div class="error-message" id="password-error">
+                        <div class="error-content">
+                            <span class="error-icon">⚠️</span>
+                            <span class="error-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campo Teléfono -->
+                <div class="field-container">
+                    <label for="phone" class="field-label">Teléfono</label>
+                    <div class="phone-wrapper">
+                        <select id="countryCode" class="country-select">
+                            <option value="+52" data-flag="🇲🇽">+52 MX</option>
+                            <option value="+1" data-flag="🇺🇸">+1 US</option>
+                            <option value="+1" data-flag="🇨🇦">+1 CA</option>
+                            <option value="+34" data-flag="🇪🇸">+34 ES</option>
+                            <option value="+33" data-flag="🇫🇷">+33 FR</option>
+                            <option value="+49" data-flag="🇩🇪">+49 DE</option>
+                        </select>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            class="form-input phone-input"
+                            placeholder="Número de teléfono"
+                            required
+                        />
+                    </div>
+                    <div class="error-message" id="phone-error">
+                        <div class="error-content">
+                            <span class="error-icon">⚠️</span>
+                            <span class="error-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de Submit -->
+                <button
+                    type="submit"
+                    id="submitButton"
+                    class="submit-button"
+                    disabled
+                >
+                    <span class="button-text">Iniciar Dem0</span>
+                </button>
+
+                <!-- Información del proceso de verificación -->
+                <div class="verification-info" id="verificationInfo" style="display: none;">
+                    <div class="info-message">
+                        <div class="info-header">
+                            <span class="info-icon">🔐</span>
+                            <h4>Proceso de Verificación KYC con JAAK</h4>
+                        </div>
+                        <ul class="verification-steps">
+                            <li class="step active">✅ Validando datos de usuario</li>
+                            <li class="step">🔄 Creando sesión segura</li>
+                            <li class="step">📋 Preparando formulario de verificación</li>
+                            <li class="step">🔗 Te redirigiremos al portal seguro de JAAK</li>
+                        </ul>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="scripts/login.js"></script>
+</body>
+</html>

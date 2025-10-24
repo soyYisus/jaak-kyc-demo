@@ -1,130 +1,214 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo KYC Embebido - JAAK Mosaic</title>
-    <link rel="stylesheet" href="styles/main.css">
-</head>
-<body>
-    <div class="container">
-        <!-- 📱 Header -->
-        <header>
-            <h1>🔒 Demo KYC Mosaic</h1>
-            <p>Sistema completo de verificación de identidad con JAAK Mosaic integrado via iframe</p>
-        </header>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Demo KYC JAAK</title>
+		<link rel="stylesheet" href="styles/main.css" />
+		<!-- Montserrat - JAAK Corporate Font -->
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet" />
+	</head>
+	<body>
+		<div class="container">
+			<!-- 📱 Header -->
+			<header>
+				<div class="header-brand">
+					<img
+						src="./assets/JAAK-logo.png"
+						alt="JAAK Logo"
+						class="jaak-logo" />
+					<div class="header-content">
+						<h1>Demo KYC JAAK</h1>
+						<p>
+							Sistema completo de verificación de identidad con JAAK integrado
+							vía iframe
+						</p>
+					</div>
+				</div>
+				<div class="header-actions">
+					<a href="/login" class="header-btn"> Cerrar Sesión </a>
+				</div>
+			</header>
 
-        <!-- 🔧 Panel de Control -->
-        <div class="control-panels">
-            <!-- 🔧 Panel de Configuración -->
-            <div class="config-panel">
-                <h3>⚙️ Configuración del Flujo KYC</h3>
+			<!-- 📊 Estado del Sistema -->
+			<!-- <div class="system-status">
+				<div class="status-card">
+					<div class="status-icon">🔧</div>
+					<div class="status-info">
+						<h4>Sistema KYC</h4>
+						<p>Listo para verificación</p>
+					</div>
+				</div>
+				<div class="status-card">
+					<div class="status-icon">🔑</div>
+					<div class="status-info">
+						<h4>Sesión</h4>
+						<p id="sessionStatus">No configurada</p>
+					</div>
+				</div>
+				<div class="status-card">
+					<div class="status-icon">📋</div>
+					<div class="status-info">
+						<h4>Pasos KYC</h4>
+						<p id="stepsStatus">0 configurados</p>
+					</div>
+				</div>
+			</div> -->
 
-                <!-- 🔑 Configuración de Short Key -->
-                <div class="config-section">
-                    <h4>🔑 Creación de Sesión KYC</h4>
-                    <div class="shortkey-controls">
-                        <div class="input-group">
-                            <label for="shortKey">Short Key JAAK:</label>
-                            <input type="text" id="shortKey" readonly placeholder="Se obtendrá automáticamente...">
-                            <button class="btn btn-icon" id="copyShortKeyBtn" title="Copiar Short Key">
-                                📋
-                            </button>
-                        </div>
-                        <button class="btn btn-secondary btn-full-width" id="getShortKeyBtn">
-                            🔄 Obtener Nuevo Short Key
-                        </button>
+			<!-- 🔧 Panel de Control -->
+			<div class="control-panels">
+				<!-- 🔧 Panel de Configuración -->
+				<div class="config-panel">
+					<div class="status-card">
+						<div class="status-icon">⚙️</div>
+						<div class="status-info">
+							<h4>Configuración KYC</h4>
+							<p>Personaliza y crea flujos de verificación KYC</p>
+						</div>
+					</div>
+
+					<!-- 🎯 Pasos del Flujo KYC -->
+					<div class="config-section">
+						<h4>🎯 Seleccionar Pasos del Flujo KYC</h4>
+
+						<!-- Información de dependencias -->
+						<!-- <div class="dependencies-info">
+							<div class="info-card">
+								<span class="info-icon">📋</span>
+								<div class="info-text">
+									<strong>Reglas de Dependencias:</strong><br>
+									<small>• <strong>One-To-One (OTO)</strong> requiere <em>Extracción</em> y <em>Verificación Facial</em></small><br>
+									<small>• Al deseleccionar una dependencia, se deseleccionan automáticamente los pasos que la requieren</small>
+								</div>
+							</div>
+						</div> -->
+
+						<div class="steps-container" id="stepsContainer">
+							<!-- Los pasos se cargarán dinámicamente -->
+						</div>
+						<button class="btn btn-primary" id="saveConfigBtn">
+							💾 Guardar Cambios
+						</button>
+					</div>
+                    					<!-- 🔑 Configuración de Short Key -->
+					<div class="config-section">
+						<h4>🔑 Creación de Flujo KYC</h4>
+						<div class="shortkey-controls">
+							<div class="input-group">
+								<label for="shortKey">Short Key JAAK:</label>
+								<input
+									type="text"
+									id="shortKey"
+									readonly
+									placeholder="Se obtendrá automáticamente..." />
+								<button
+									class="btn btn-icon"
+									id="copyShortKeyBtn"
+									title="Copiar Short Key">
+									📋
+								</button>
+							</div>
+							<button class="btn btn-secondary btn-full-width" id="getShortKeyBtn">
+								🔄 Obtener Nuevo Short Key
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- 📊 Panel de Datos de Sesión -->
+				<div class="session-panel">
+				<div class="status-card">
+					<div class="status-icon">📋</div>
+					<div class="status-info">
+						<h4>Datos de Sesión KYC</h4>
+						<div style="display: flex; align-items: center; gap: 0.5rem">
+                        <p>Monitoreo Real-Time: </p><p id="stepsStatus">0 configurados</p>
+					</div>
                     </div>
-                </div>
+				</div>
 
-                <!-- 🎯 Pasos del Flujo KYC -->
-                <div class="config-section">
-                    <h4>🎯 Seleccionar Pasos del Flujo KYC</h4>
-                    <div class="steps-container" id="stepsContainer">
-                        <!-- Los pasos se cargarán dinámicamente -->
-                    </div>
-                    <button class="btn btn-primary" id="saveConfigBtn">
-                        💾 Guardar Cambios
-                    </button>
-                </div>
-            </div>
+					<!-- 📈 Progreso -->
+					<div class="config-section">
+						<h4>📈 Progreso del Flujo</h4>
+						<div class="progress-bar">
+							<div class="progress-fill" id="progressFill"></div>
+						</div>
+						<div id="progressText">Esperando inicio del flujo...</div>
+					</div>
 
-            <!-- 📊 Panel de Datos de Sesión -->
-            <div class="session-panel">
-                <h3>📊 Datos de Sesión KYC</h3>
+					<!-- 📊 Datos Capturados -->
+					<div class="config-section">
+						<h4>📊 Datos Capturados</h4>
+						<div class="data-content" id="dataContent">
+							<p class="no-data">No hay datos disponibles</p>
+						</div>
+					</div>
 
-                <!-- 📈 Progreso -->
-                <div class="config-section">
-                    <h4>📈 Progreso del Flujo</h4>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                    <div id="progressText">Esperando inicio del flujo...</div>
-                </div>
+					<!-- 📤 Botones de Exportación -->
+					<div class="config-section">
+						<div class="export-buttons">
+							<button class="btn btn-secondary" id="exportDataBtn" disabled>
+								📤 Exportar Resultados
+							</button>
+							<button class="btn btn-secondary" id="copyDataBtn" disabled>
+								📋 Copiar Datos
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
-                <!-- 📊 Datos Capturados -->
-                <div class="config-section">
-                    <h4>📊 Datos Capturados</h4>
-                    <div class="data-content" id="dataContent">
-                        <p class="no-data">No hay datos disponibles</p>
-                    </div>
-                </div>
+			<!-- 📱 Vista del Usuario Final -->
+			<div class="user-view">
+				<!-- 🖼️ Iframe Container -->
+				<div class="iframe-container">
+					<div class="iframe-header">
+						<div class="status-card">
+							<div class="status-icon">🔑</div>
+							<div class="status-info">
+								<h4>Verificación KYC - <small>Vista del usuario final</small></h4>
+								<p id="sessionStatus">No configurada</p>
+							</div>
+						</div>
+						<div class="iframe-controls">
+							<button class="btn btn-primary" id="startKycBtn">
+								🚀 Iniciar Flujo KYC
+							</button>
+							<button class="btn btn-warning" id="restartKycBtn">
+								🔄 Reiniciar
+							</button>
+						</div>
+					</div>
+					<iframe
+						id="kycIframe"
+						src="about:blank"
+						allow="camera; microphone; geolocation; fullscreen; web-share"
+						sandbox="allow-scripts allow-same-origin allow-forms allow-top-navigation allow-popups allow-popups-to-escape-sandbox"></iframe>
+				</div>
 
-                <!-- 📤 Botones de Exportación -->
-                <div class="config-section">
-                    <div class="export-buttons">
-                        <button class="btn btn-secondary" id="exportDataBtn" disabled>
-                            📤 Exportar Resultados
-                        </button>
-                        <button class="btn btn-secondary" id="copyDataBtn" disabled>
-                            📋 Copiar Datos
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+				<!-- 📝 Panel de Logs -->
+				<div class="logs-panel">
+					<div class="panel-section">
+						<h4>📝 Logs del Sistema</h4>
+						<div class="logs-content" id="logsContent">
+							<div class="log-entry info">
+								<span class="log-time">--:--:--</span>
+								<span class="log-message">Sistema iniciado - Listo para usar</span>
+							</div>
+						</div>
+						<button
+							class="btn btn-secondary"
+							id="clearLogsBtn"
+							style="margin-top: 10px">
+							🗑️ Limpiar Logs
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
-        <!-- 📱 Vista del Usuario Final -->
-        <div class="user-view">
-            <!-- 🖼️ Iframe Container -->
-            <div class="iframe-container">
-                <div class="iframe-header">
-                    <h3>🖼️ Vista del Usuario Final - KYC</h3>
-                    <div class="iframe-controls">
-                        <button class="btn btn-primary" id="startKycBtn">
-                            🚀 Iniciar Flujo KYC
-                        </button>
-                        <button class="btn btn-warning" id="restartKycBtn">
-                            🔄 Reiniciar
-                        </button>
-                    </div>
-                </div>
-                <iframe
-                    id="kycIframe"
-                    src="about:blank"
-                    allow="camera; microphone; geolocation; fullscreen; web-share"
-                    sandbox="allow-scripts allow-same-origin allow-forms allow-top-navigation allow-popups allow-popups-to-escape-sandbox"
-                ></iframe>
-            </div>
-
-            <!-- 📝 Panel de Logs -->
-            <div class="logs-panel">
-                <div class="panel-section">
-                    <h4>📝 Logs del Sistema</h4>
-                    <div class="logs-content" id="logsContent">
-                        <div class="log-entry info">
-                            <span class="log-time">--:--:--</span>
-                            <span class="log-message">Sistema iniciado - Listo para usar</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-secondary" id="clearLogsBtn" style="margin-top: 10px;">
-                        🗑️ Limpiar Logs
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="scripts/kyc-embed.js"></script>
-</body>
+		<script src="scripts/kyc-embed.js"></script>
+	</body>
 </html>

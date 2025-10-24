@@ -210,14 +210,20 @@ app.post('/api/kyc/flow', async (req, res) => {
     }
 });
 
-// 🏠 Ruta principal
+// 🏠 Rutas principales
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
+// 🔐 Ruta de login
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/login.html'));
 });
 
 // 🚀 Iniciar servidor
 app.listen(PORT, () => {
     console.log(`🚀 Servidor KYC ejecutándose en http://localhost:${PORT}`);
+    console.log(`🔐 Página de login: http://localhost:${PORT}/login`);
     console.log(`📱 Demo embebido: http://localhost:${PORT}/index.html`);
     console.log(`🔗 API endpoint: http://localhost:${PORT}/api/kyc/flow`);
 });
