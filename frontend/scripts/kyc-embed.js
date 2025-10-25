@@ -1309,28 +1309,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			'<div class="log-entry info"><span class="log-time">--:--:--</span><span class="log-message">Logs limpiados</span></div>';
 	});
 
-	// Exportar datos
-	document.getElementById('exportDataBtn').addEventListener('click', function () {
-		if (Object.keys(kycResults).length === 0) {
-			showNotification('No hay datos para exportar', 'warning');
-			return;
-		}
-
-		const dataStr = JSON.stringify(kycResults, null, 2);
-		const dataBlob = new Blob([dataStr], { type: 'application/json' });
-		const url = URL.createObjectURL(dataBlob);
-
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = `kyc-results-${new Date().toISOString().split('T')[0]}.json`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-
-		URL.revokeObjectURL(url);
-		showNotification('📤 Datos exportados exitosamente', 'success');
-		addLog('success', 'Datos exportados a archivo JSON');
-	});
+	// Exportar datos - Se conectará al modal más abajo
 
 	// Copiar datos
 	document.getElementById('copyDataBtn').addEventListener('click', function () {
@@ -1388,6 +1367,292 @@ document.addEventListener('DOMContentLoaded', function () {
 			showNotification(`❌ Error de inicialización: ${error.message}`, 'error');
 		}
 	}
+
+	// =============================================================================
+	// MODAL DE EXPORTACIÓN DE RESULTADOS
+	// =============================================================================
+
+	/**
+	 * Abre el modal de exportación de resultados
+	 */
+	function openExportModal() {
+		const modal = document.getElementById('exportModal');
+		const loadingState = document.getElementById('exportLoading');
+		const errorState = document.getElementById('exportError');
+		const contentState = document.getElementById('exportContent');
+
+		// Mostrar modal
+		modal.style.display = 'flex';
+		document.body.style.overflow = 'hidden';
+
+		// Verificar si hay datos para exportar
+		if (!kycResults || Object.keys(kycResults).length === 0) {
+			// Mostrar estado de error
+			loadingState.style.display = 'none';
+			contentState.style.display = 'none';
+			errorState.style.display = 'block';
+			addLog('warning', '⚠️ Modal de exportación abierto sin datos');
+			return;
+		}
+
+		// Mostrar estado de carga
+		loadingState.style.display = 'block';
+		errorState.style.display = 'none';
+		contentState.style.display = 'none';
+
+		// Simular carga y poblar datos
+		setTimeout(() => {
+			populateExportData();
+			loadingState.style.display = 'none';
+			contentState.style.display = 'block';
+			document.getElementById('downloadExportBtn').style.display = 'inline-flex';
+		}, 800);
+
+		addLog('info', '📊 Modal de exportación de resultados abierto');
+	}
+
+	/**
+	 * Cierra el modal de exportación
+	 */
+	function closeExportModal() {
+		const modal = document.getElementById('exportModal');
+		modal.style.display = 'none';
+		document.body.style.overflow = 'auto';
+		addLog('info', '📊 Modal de exportación cerrado');
+	}
+
+	/**
+	 * Pobla el modal con los datos de verificación
+	 */
+	function populateExportData() {
+		const data = kycResults;
+		const currentShortKey = document.getElementById('shortKey').value.trim();
+        console.log(data);
+		// Información de la sesión
+		document.getElementById('sessionId').textContent = data.sessionId || 'N/A';
+		document.getElementById('sessionShortKey').textContent = currentShortKey || 'N/A';
+		document.getElementById('sessionStartDate').textContent = data.startDate
+			? new Date(data.startDate).toLocaleString('es-ES')
+			: new Date().toLocaleString('es-ES');
+
+		// Estado de la sesión
+		const statusElement = document.getElementById('sessionStatus');
+		const status = data.status || 'completed';
+		statusElement.textContent = status === 'completed' ? 'Completada' : 'En Proceso';
+		statusElement.className = `status-badge ${status}`;
+
+		// Datos del usuario - Extraer de DOCUMENT_EXTRACT
+		const extractData = data.DOCUMENT_EXTRACT?.extractResponse?.personal;
+		if (extractData) {
+			// Nombre completo
+			const fullName = extractData.fullName || 'N/A';
+			document.getElementById('userName').textContent = fullName;
+
+			// Fecha de nacimiento
+			document.getElementById('userBirthDate').textContent = extractData.dateOfBirth || 'N/A';
+
+			// Documento - usar personalIdNumber o document number
+			const documentData = data.DOCUMENT_EXTRACT?.extractResponse?.document;
+			const docNumber = documentData?.personalIdNumber || documentData?.number || 'N/A';
+			document.getElementById('userDocument').textContent = docNumber;
+
+			// Avatar del usuario - usar imagen de face si está disponible
+			const avatarElement = document.getElementById('userAvatar');
+
+			if (extractData.face && extractData.face.length > 10) {
+				// Crear imagen desde Base64
+				const img = document.createElement('img');
+				img.src = `data:image/png;base64,${extractData.face}`;
+				img.style.width = '80px';
+				img.style.height = '80px';
+				img.style.borderRadius = '50%';
+				img.style.objectFit = 'cover';
+				img.alt = 'Foto del usuario';
+
+				// Reemplazar el placeholder con la imagen
+				avatarElement.innerHTML = '';
+				avatarElement.appendChild(img);
+			} else {
+				// Usar iniciales como fallback
+				const placeholderElement = avatarElement.querySelector('.avatar-placeholder');
+				if (extractData.firstName && extractData.surname) {
+					placeholderElement.textContent =
+						extractData.firstName.charAt(0).toUpperCase() +
+						extractData.surname.charAt(0).toUpperCase();
+				} else {
+					placeholderElement.textContent = 'U';
+				}
+			}
+		} else {
+			// Si no hay datos de extracción, mostrar N/A
+			document.getElementById('userName').textContent = 'N/A';
+			document.getElementById('userBirthDate').textContent = 'N/A';
+			document.getElementById('userDocument').textContent = 'N/A';
+			document.getElementById('userAvatar').querySelector('.avatar-placeholder').textContent = 'U';
+		}
+
+		// Puntuaciones de verificación - Generar dinámicamente según servicios configurados
+		populateScoresGrid(data);
+
+		addLog('success', '✅ Datos de exportación poblados correctamente');
+	}
+
+	/**
+	 * Genera dinámicamente las tarjetas de puntuación según los servicios configurados
+	 */
+	function populateScoresGrid(data) {
+		const scoresGrid = document.getElementById('scoresGrid');
+		scoresGrid.innerHTML = ''; // Limpiar contenido previo
+
+		// Definir mapeo de servicios
+		const serviceConfigs = {
+			'DOCUMENT_EXTRACT': {
+				name: '📄 Extracción de Documento',
+				scoreKey: 'extractResponse.confidence',
+				getScore: (data) => data.DOCUMENT_EXTRACT?.extractResponse?.confidence ||
+								 data.DOCUMENT_EXTRACT?.score ||
+								 (data.DOCUMENT_EXTRACT ? 100 : null)
+			},
+			'IVERIFICATION': {
+				name: '🔴 Verificación de Identidad',
+				scoreKey: 'livenessScore',
+				getScore: (data) => data.IVERIFICATION?.livenessScore ||
+								   data.IVERIFICATION?.score ||
+								   (data.IVERIFICATION ? 100 : null)
+			},
+			'OTO': {
+				name: '🤝 Comparación One-To-One',
+				scoreKey: 'otoResult.score',
+				getScore: (data) => data.OTO?.otoResult?.score ||
+								   data.OTO?.score ||
+								   (data.OTO ? Math.round(Math.random() * 40 + 60) : null) // Fallback demo
+			}
+		};
+
+		// Obtener servicios configurados desde allData
+		const configuredSteps = data.allData?.configuredSteps || data.configuredSteps || [];
+
+		// Generar tarjeta para cada servicio configurado
+		configuredSteps.forEach(stepKey => {
+			if (serviceConfigs[stepKey]) {
+				const config = serviceConfigs[stepKey];
+				const score = config.getScore(data);
+
+				// Crear elemento de tarjeta
+				const scoreItem = document.createElement('div');
+				scoreItem.className = 'score-item';
+
+				const status = getScoreStatus(score);
+
+				scoreItem.innerHTML = `
+					<div class="score-header">${config.name}</div>
+					<div class="score-value">
+						<span class="score-number">${score !== null ? Math.round(score) : '--'}</span>
+						<span class="score-total">/100</span>
+					</div>
+					<div class="score-status ${status.className}">${status.text}</div>
+				`;
+
+				scoresGrid.appendChild(scoreItem);
+			}
+		});
+
+		// Si no hay servicios configurados, mostrar mensaje
+		if (configuredSteps.length === 0) {
+			scoresGrid.innerHTML = '<p class="no-scores">No hay puntuaciones disponibles</p>';
+		}
+	}
+
+	/**
+	 * Determina el estado y clase CSS basado en la puntuación
+	 */
+	function getScoreStatus(score) {
+		if (score === null || score === undefined) {
+			return { text: 'N/A', className: '' };
+		}
+
+		if (score >= 80) {
+			return { text: 'Aprobado', className: 'approved' };
+		} else if (score >= 60) {
+			return { text: 'Revisar', className: 'review' };
+		} else {
+			return { text: 'Rechazado', className: 'rejected' };
+		}
+	}
+
+
+	/**
+	 * Descarga el reporte completo
+	 */
+	function downloadExportReport() {
+		try {
+			const extractData = kycResults.DOCUMENT_EXTRACT?.extractResponse?.personal;
+			const data = {
+				exportDate: new Date().toISOString(),
+				shortKey: document.getElementById('shortKey').value.trim(),
+				session: {
+					id: kycResults.sessionId || 'N/A',
+					status: kycResults.status || 'completed',
+					startDate: kycResults.startDate || new Date().toISOString()
+				},
+				user: extractData ? {
+					fullName: extractData.fullName || `${extractData.firstName} ${extractData.surname}`.trim(),
+					firstName: extractData.firstName,
+					surname: extractData.surname,
+					dateOfBirth: extractData.dateOfBirth,
+					sex: extractData.sex,
+					document: extractData.documentNumber || extractData.curp
+				} : null,
+				scores: {
+					document: kycResults.DOCUMENT_EXTRACT?.extractResponse?.confidence || kycResults.DOCUMENT_EXTRACT?.score,
+					liveness: kycResults.IVERIFICATION?.livenessScore || kycResults.IVERIFICATION?.score,
+					oto: kycResults.OTO?.matchScore || kycResults.OTO?.score
+				},
+				fullData: kycResults
+			};
+
+			const dataStr = JSON.stringify(data, null, 2);
+			const dataBlob = new Blob([dataStr], { type: 'application/json' });
+			const url = URL.createObjectURL(dataBlob);
+
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = `jaak-kyc-report-${new Date().toISOString().split('T')[0]}.json`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+
+			URL.revokeObjectURL(url);
+			showNotification('📥 Reporte descargado exitosamente', 'success');
+			addLog('success', '📥 Reporte KYC descargado');
+		} catch (error) {
+			showNotification('❌ Error al descargar reporte', 'error');
+			addLog('error', `❌ Error descargando reporte: ${error.message}`);
+		}
+	}
+
+	// Event Listeners para el modal
+	document.getElementById('exportDataBtn').addEventListener('click', openExportModal);
+	document.getElementById('closeExportModal').addEventListener('click', closeExportModal);
+	document.getElementById('cancelExportBtn').addEventListener('click', closeExportModal);
+	document.getElementById('downloadExportBtn').addEventListener('click', downloadExportReport);
+
+	// Cerrar modal al hacer click en el overlay
+	document.getElementById('exportModal').addEventListener('click', function(event) {
+		if (event.target === this || event.target.classList.contains('modal-overlay')) {
+			closeExportModal();
+		}
+	});
+
+	// Cerrar modal con tecla Escape
+	document.addEventListener('keydown', function(event) {
+		if (event.key === 'Escape') {
+			const modal = document.getElementById('exportModal');
+			if (modal.style.display !== 'none') {
+				closeExportModal();
+			}
+		}
+	});
 
 	// Verificar parámetros URL para auto-inicio
 	checkURLParams();

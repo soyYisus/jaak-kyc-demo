@@ -209,6 +209,118 @@
 			</div>
 		</div>
 
+		<!-- Modal de Exportación de Resultados -->
+		<div id="exportModal" class="export-modal" style="display: none;">
+			<div class="modal-overlay"></div>
+			<div class="modal-container">
+				<div class="modal-header">
+					<div class="modal-title">
+						<span class="modal-icon">📊</span>
+						<h3>Resultados de Verificación KYC</h3>
+					</div>
+					<button class="modal-close" id="closeExportModal">
+						<span>✕</span>
+					</button>
+				</div>
+
+				<div class="modal-content">
+					<!-- Loading State -->
+					<div id="exportLoading" class="export-loading" style="display: none;">
+						<div class="loading-spinner">⏳</div>
+						<p>Cargando resultados de verificación...</p>
+					</div>
+
+					<!-- Error State -->
+					<div id="exportError" class="export-error" style="display: none;">
+						<div class="error-icon">⚠️</div>
+						<p class="error-message">No hay resultados disponibles para exportar</p>
+						<small>Inicie un flujo KYC para generar resultados</small>
+					</div>
+
+					<!-- Results Content -->
+					<div id="exportContent" class="export-content" style="display: none;">
+						<!-- Session Info -->
+						<div class="session-info-card">
+							<div class="card-header">
+								<span class="card-icon">🔐</span>
+								<h4>Información de la Sesión</h4>
+							</div>
+							<div class="card-content">
+								<div class="info-row">
+									<label>ID de Sesión:</label>
+									<span id="sessionId">--</span>
+								</div>
+								<div class="info-row">
+									<label>Estado:</label>
+									<span class="status-badge" id="sessionStatus">--</span>
+								</div>
+								<div class="info-row">
+									<label>Fecha de Inicio:</label>
+									<span id="sessionStartDate">--</span>
+								</div>
+								<div class="info-row">
+									<label>Short Key:</label>
+									<span id="sessionShortKey">--</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- User Data -->
+						<div class="user-data-card">
+							<div class="card-header">
+								<span class="card-icon">👤</span>
+								<h4>Datos del Usuario</h4>
+							</div>
+							<div class="card-content">
+								<div class="user-profile">
+									<div class="profile-avatar" id="userAvatar">
+										<span class="avatar-placeholder">U</span>
+									</div>
+									<div class="profile-details">
+										<div class="info-row">
+											<label>Nombre:</label>
+											<span id="userName">--</span>
+										</div>
+										<div class="info-row">
+											<label>Fecha de Nacimiento:</label>
+											<span id="userBirthDate">--</span>
+										</div>
+										<div class="info-row">
+											<label>Documento:</label>
+											<span id="userDocument">--</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Verification Scores -->
+						<div class="scores-card">
+							<div class="card-header">
+								<span class="card-icon">📈</span>
+								<h4>Puntuaciones de Verificación</h4>
+							</div>
+							<div class="card-content">
+								<div class="scores-grid" id="scoresGrid">
+									<!-- Se generarán dinámicamente según los servicios configurados -->
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button class="btn btn-secondary" id="cancelExportBtn">
+						Cerrar
+					</button>
+					<button class="btn btn-primary" id="downloadExportBtn" style="display: none;">
+						📥 Descargar Reporte
+					</button>
+				</div>
+			</div>
+		</div>
+
 		<script src="scripts/kyc-embed.js"></script>
 	</body>
 </html>
