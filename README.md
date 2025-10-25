@@ -1,6 +1,6 @@
-# JAAK KYC Mosaic Integration Example
+# JAAK KYC Fast Demo
 
-A complete implementation example for integrating JAAK Mosaic KYC verification in web applications using iframe embedding.
+A complete implementation example for integrating JAAK KYC verification in web applications using iframe embedding.
 
 ## Features
 
@@ -21,8 +21,8 @@ A complete implementation example for integrating JAAK Mosaic KYC verification i
 
 1. Clone and install dependencies:
 ```bash
-git clone https://github.com/soyYisus/jaak-kyc-mosaic-usage-example
-cd jaak-kyc-mosaic-usage-example
+git clone https://github.com/soyYisus/jaak-kyc-fast-demo
+cd jaak-kyc-fast-demo
 cd backend && npm install
 ```
 
